@@ -1,0 +1,27 @@
+services:
+  app:
+    build: .
+    container_name: BarTrader_App
+    ports:
+      - "8080:80"
+    volumes:
+      - ./src:/var/www/html
+    depends_on:
+      - db
+    env_file:
+      - .env
+
+  db:
+    image: mysql:8.0
+    container_name: BarTrader_DB
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+volumes:
+  db_data:

@@ -21,7 +21,7 @@ class Button{
         return $this->scenarios;
     }
 
-    function choseScenario(){
+    function chooseScenario(){
         if ($this->currentScenario === null){
             $index = array_rand($this->scenarios);
             $this->currentScenario = $this->scenarios[$index];
@@ -30,7 +30,7 @@ class Button{
     }
 
     function cache(string $selection){
-    # Chache von z.B. 3 Einführen, damit eine Funktion nicht direckt nochmal gezogen werden kann.
+    # Cache von z.B. 3 Einführen, damit eine Funktion nicht direckt nochmal gezogen werden kann.
     # dafür erstmal Funktionen schreiben
     }
 

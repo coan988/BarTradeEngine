@@ -1,7 +1,10 @@
 <?php
+include __DIR__ . "/BarTradeEngine/backend/pricebuilding/pricebuilding.php";
+
+
 function stockmarketcrash(){
     $test = 1;
-    return $test;
+    return $newprice;
 }
 
 function subvention(){
