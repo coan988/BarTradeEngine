@@ -1,0 +1,22 @@
+CREATE TABLE IF NOT EXISTS drinks (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE,
+    price DECIMAL(10,2) NOT NULL,
+    order_count INT NOT NULL DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS order_log (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    drink_id INT NOT NULL,
+    price_at_order DECIMAL(10,2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_order_log_drink
+        FOREIGN KEY (drink_id) REFERENCES drinks(id)
+);
+
+LOAD DATA INFILE '/var/lib/mysql-files/pricelist.txt'
+INTO TABLE drinks
+FIELDS TERMINATED BY ','
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS
+(name, price);

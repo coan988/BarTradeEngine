@@ -1,0 +1,5 @@
+name,price(EUR.CENT = 00.00)
+Bachwasser,2.00
+Rum,4.00
+Asbach,4.00
+Wasser,1.00

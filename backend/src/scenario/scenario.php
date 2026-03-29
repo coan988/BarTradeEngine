@@ -1,9 +1,9 @@
 <?php
-include __DIR__ . "/BarTradeEngine/backend/pricebuilding/pricebuilding.php";
+include __DIR__ . "/src/pricebuilding/pricebuilding.php";
 
 
 function stockmarketcrash(){
-    $test = 1;
+    $newprice = 1;
     return $newprice;
 }
 

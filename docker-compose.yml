@@ -1,27 +1,46 @@
 services:
-  app:
-    build: .
-    container_name: BarTrader_App
+  frontend:
+    image: node:22-alpine
+    container_name: bte_frontend
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+    command: sh -c "npm install && npm run dev -- --host"
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+  backend:
+    build: ./backend
+    container_name: bte_backend
+    volumes:
+      - ./backend:/var/www/html
     ports:
       - "8080:80"
-    volumes:
-      - ./src:/var/www/html
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
     depends_on:
       - db
-    env_file:
-      - .env
 
   db:
     image: mysql:8.0
-    container_name: BarTrader_DB
+    container_name: bte_db
     restart: always
-    env_file:
-      - .env
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASS}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     ports:
       - "3307:3306"
     volumes:
       - db_data:/var/lib/mysql
-      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./db/pricelist.txt:/var/lib/mysql-files/pricelist.txt
 
 volumes:
   db_data:
