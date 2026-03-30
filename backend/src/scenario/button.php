@@ -8,7 +8,7 @@ class Button{
 
         $buttonfunc = get_defined_functions()['user'];
         include_once __DIR__ .'/scenario.php';
-        $scenariofunc = get_defined_functions()['user'];
+        $scenariofunc = get_defined_functions()['user'];    
 
         $this->scenarios = array_values(array_diff($scenariofunc, $buttonfunc));
 

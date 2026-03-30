@@ -1,18 +1,17 @@
 <?php
 
-require __DIR__ . '/db.php';
+require_once __DIR__ . '/db.php';
 
 try {
-    $db = getDb();
 
-    echo "DB Verbindung erfolgreich\n";
+    $pdo = getDb();
 
-    $stmt = $db->query("SELECT NOW() as time");
-    $result = $stmt->fetch();
+    echo "DB Verbindung erfolgreich\n\n";
 
-    print_r($result);
+    var_dump($pdo);
 
-} catch (Throwable $e) {
-    echo "DB Fehler:\n";
+} catch (PDOException $e) {
+
+    echo "DB Verbindung fehlgeschlagen:\n";
     echo $e->getMessage();
 }

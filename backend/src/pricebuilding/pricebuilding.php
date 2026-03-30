@@ -1,15 +1,26 @@
 <?php
 
-require_once __DIR__ .'/db.php';
+require_once __DIR__ .'backend/src/db.php';
 
-function drinkOrder(string $drinkName): void
-{
+function button(){
+    $pdo = getDb(); # preisliste holen
+    $drinkId = $pdo[]; #pdo output anschauen
+    # button class ausführen --> Ergebniss(scenario) prozentuale Preisveränderung, 
+    # preise mit prozentuealer veränderung bearbeiten
+    require __DIR__ .'src/scenario/button.php';
+    $button = new Button();
+    for (n; $pdo) {
+
+    }
+}
+
+function drinkOrder(string $drinkName){
     $pdo = getDb();
 
     $pdo->beginTransaction();
 
     try {
-        $stmt = $pdo->prepare("SELECT id, price, orders FROM drinks WHERE name = ?");
+        $stmt = $pdo->prepare("SELECT id, price, orders FROM drinks WHERE name = $drinkName");
         $stmt->execute([$drinkName]);
         $drink = $stmt->fetch();
 

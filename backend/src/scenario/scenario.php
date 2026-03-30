@@ -1,6 +1,6 @@
 <?php
 include __DIR__ . "/src/pricebuilding/pricebuilding.php";
-
+$pricelist = 
 
 function stockmarketcrash(){
     $newprice = 1;
