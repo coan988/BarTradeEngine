@@ -1,6 +1,11 @@
 # BarTradeEngine
 BarTradeEngine is a dynamic pricing engine for bars. It processes real-time POS sales data, visualizes drink demand, and automatically adjusts prices based on supply and demand.
 
-# start
-docker compose exec backend composer install
-//um die .env im backend auszulesen
+# vorinstallation
+docker compose exec backend composer install    //um die .env im backend 
+
+# tests
+docker compose exec backend php /var/www/html/src/test_db.php
+
+# DB zugriff
+docker compose exec db mysql -u <user> -p <db_name>
