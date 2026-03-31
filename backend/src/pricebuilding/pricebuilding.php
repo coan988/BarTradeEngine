@@ -1,56 +1,81 @@
 <?php
 
-require_once __DIR__ .'backend/src/db.php';
+declare(strict_types=1);
+
+require_once __DIR__ . '/../db.php';
+require_once __DIR__ . '/../scenario/button.php';
 
 function button(){
-    $pdo = getDb(); # preisliste holen
-    $drinkId = $pdo[]; #pdo output anschauen
-    # button class ausführen --> Ergebniss(scenario) prozentuale Preisveränderung, 
-    # preise mit prozentuealer veränderung bearbeiten
-    require __DIR__ .'src/scenario/button.php';
     $button = new Button();
-    for (n; $pdo) {
-
-    }
+    return $button->chooseScenario();
 }
 
-function drinkOrder(string $drinkName){
-    $pdo = getDb();
+function drinkorder(string $name, int $order_count): array{
+    if ($order_count <= 0) {
+        throw new InvalidArgumentException('order_count muss größer als 0 sein.');
+    }
 
+    $pdo = getDb();
     $pdo->beginTransaction();
 
     try {
-        $stmt = $pdo->prepare("SELECT id, price, orders FROM drinks WHERE name = $drinkName");
-        $stmt->execute([$drinkName]);
-        $drink = $stmt->fetch();
+        $stmt = $pdo->prepare(
+            'SELECT id, name, price, order_count
+             FROM drinks
+             WHERE name = :name
+             LIMIT 1
+             FOR UPDATE'
+        );
+        $stmt->execute(['name' => $name]);
+
+        $drink = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$drink) {
-            throw new InvalidArgumentException("Getränk '{$drinkName}' nicht gefunden.");
+            throw new InvalidArgumentException("Getränk '{$name}' nicht gefunden.");
         }
 
-        $newOrders = $drink['orders'] + 1;
-        $newPrice = (float)$drink['price'];
+        $oldOrderCount = (int)$drink['order_count'];
+        $newOrderCount = $oldOrderCount + $order_count;
 
-        if ($newOrders % 10 === 0) {
-            $newPrice = round($newPrice * 1.01, 2);
+        $oldPrice = (float)$drink['price'];
+        $newPrice = $oldPrice;
+
+        $oldSteps = intdiv($oldOrderCount, 10);
+        $newSteps = intdiv($newOrderCount, 10);
+        $stepDiff = $newSteps - $oldSteps;
+
+        for ($i = 0; $i < $stepDiff; $i++) {
+            $newPrice *= 1.01;
         }
 
-        $updateStmt = $pdo->prepare("
-            UPDATE drinks
-            SET orders = ?, price = ?
-            WHERE id = ?
-        ");
-        $updateStmt->execute([$newOrders, $newPrice, $drink['id']]);
+        $newPrice = round($newPrice, 2);
 
-        $logStmt = $pdo->prepare("
-            INSERT INTO order_log (drink_id, ordered_price)
-            VALUES (?, ?)
-        ");
-        $logStmt->execute([$drink['id'], $drink['price']]);
+        $updateStmt = $pdo->prepare(
+            'UPDATE drinks
+             SET price = :price, order_count = :order_count
+             WHERE id = :id'
+        );
+
+        $updateStmt->execute([
+            'price'       => $newPrice,
+            'order_count' => $newOrderCount,
+            'id'          => (int)$drink['id'],
+        ]);
 
         $pdo->commit();
+
+        return [
+            'id' => (int)$drink['id'],
+            'name' => (string)$drink['name'],
+            'old_price' => $oldPrice,
+            'new_price' => $newPrice,
+            'old_order_count' => $oldOrderCount,
+            'new_order_count' => $newOrderCount,
+        ];
     } catch (Throwable $e) {
-        $pdo->rollBack();
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
         throw $e;
     }
 }
