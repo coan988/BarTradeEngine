@@ -11,3 +11,4 @@ docker compose exec backend php /var/www/html/src/scenario/test_button.php
 
 # DB zugriff
 docker compose exec db mysql -u <user> -p <db_name>
+

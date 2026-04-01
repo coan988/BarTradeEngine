@@ -44,7 +44,7 @@ function drinkorder(string $name, int $order_count): array{
         $newSteps = intdiv($newOrderCount, 10);
         $stepDiff = $newSteps - $oldSteps;
 
-        for ($i = 0; $i < $stepDiff; $i++) {
+        for ($i = 0; $i < $stepDiff; $i++){
             $newPrice *= 1.01;
         }
 
@@ -62,6 +62,20 @@ function drinkorder(string $name, int $order_count): array{
             'id'          => (int)$drink['id'],
         ]);
 
+        $ordervolume = $newOrderCount - $oldOrderCount;
+
+        for ($i = 0; $i < $ordervolume; $i++){
+            $updatelog = $pdo->prepare(
+                'INSERT INTO order_log (drink_id, price_at_order)
+                VALUES (:id, :price)'
+            );
+
+            $updatelog->execute([
+                'price'       => $oldPrice,
+                'id'          => (int)$drink['id'],
+            ]);
+        };
+        
         $pdo->commit();
 
         return [
