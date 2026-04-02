@@ -5,7 +5,6 @@ class Button{
     private ?string $currentScenario = null;
 
     function __construct(){
-        include_once __DIR__ .'/../db.php';
         $buttonfunc = get_defined_functions()['user'];
 
         include_once __DIR__ .'/scenario.php';
@@ -35,8 +34,10 @@ class Button{
     # dafür erstmal Funktionen schreiben
     }
 
-    public function run(){
+    public function run(): array{
+        require_once __DIR__ . '/../pricebuilding/pricebuilding.php';
         $selection = $this->chooseScenario();
-        return $selection();
+        $scenario = $selection();
+        return applyScenario($scenario);
     }
 }

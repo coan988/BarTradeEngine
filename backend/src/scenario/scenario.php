@@ -1,65 +1,28 @@
 <?php
-require_once __DIR__ . '/../db.php';
 
-function stockmarketcrash(){
-    $pdo = getDb();
-    $pdo->beginTransaction();
-
-    $stmt = $pdo->prepare(
-        'UPDATE drinks
-        SET price = price*0.5'
-    );
-    $stmt->execute();
-
-    $pdo->commit();
-    echo("stockmarketcrash");
+function stockmarketcrash(): array
+{
+    return [
+        'name' => 'stockmarketcrash',
+        'type' => 'all_prices_factor',
+        'factor' => 0.5,
+    ];
 }
 
-function drinksubvention(){
-    $pdo = getDb();
-    $pdo->beginTransaction();
-
-    $stmt = $pdo->prepare(
-        'SELECT id, name
-        FROM drinks
-        FOR UPDATE'
-    );
-    $stmt->execute();
-
-    $drinks = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    if (!$drinks) {
-    $pdo->rollBack();
-    return;
-    }
-
-    $randomKey = array_rand($drinks);
-    $drink = $drinks[$randomKey];
-
-    $updateStmt = $pdo->prepare(
-        'UPDATE drinks
-        SET price = price*0.5
-        WHERE id = :id'
-    );
-
-    $updateStmt->execute([
-        'id' => (int)$drink['id'],
-    ]);
-
-    $pdo->commit();
-    echo("drinksubvention");
+function drinksubvention(): array
+{
+    return [
+        'name' => 'drinksubvention',
+        'type' => 'random_drink_factor',
+        'factor' => 0.5,
+    ];
 }
 
-function alltimehight(){
-    $pdo = getDb();
-    $pdo->beginTransaction();
-
-    $stmt = $pdo->prepare(
-        'UPDATE drinks
-        SET price = price*1.5'
-    );
-    $stmt->execute();
-
-    $pdo->commit();
-    echo("alltimehight");
+function alltimehigh(): array
+{
+    return [
+        'name' => 'alltimehigh',
+        'type' => 'all_prices_factor',
+        'factor' => 1.5,
+    ];
 }

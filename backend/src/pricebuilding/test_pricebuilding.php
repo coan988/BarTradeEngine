@@ -4,20 +4,6 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/pricebuilding.php';
 
-echo "Test button():\n";
-
-try {
-    $result = button();
-
-    echo "Button erfolgreich ausgeführt.\n";
-    var_dump($result);
-
-} catch (Throwable $e) {
-
-    echo "Fehler bei button():\n";
-    echo $e->getMessage() . "\n";
-}
-
 echo "\nTest drinkorder():\n";
 
 try {
