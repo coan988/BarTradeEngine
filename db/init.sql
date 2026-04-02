@@ -14,6 +14,12 @@ CREATE TABLE IF NOT EXISTS order_log (
         FOREIGN KEY (drink_id) REFERENCES drinks(id)
 );
 
+CREATE TABLE IF NOT EXISTS scenario_log (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    scenario_name VARCHAR(100) NOT NULL,
+    executed_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 LOAD DATA INFILE '/var/lib/mysql-files/pricelist.txt'
 INTO TABLE drinks
 FIELDS TERMINATED BY ','

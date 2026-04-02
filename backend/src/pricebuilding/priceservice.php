@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../db.php';
 
-function applyScenario(array $scenario): array{
+function applyScenario(array $scenario): array
+{
     $pdo = getDb();
     $pdo->beginTransaction();
 
     try {
+        $affectedDrink = null;
+
         switch ($scenario['type']) {
             case 'all_prices_factor':
                 $stmt = $pdo->prepare(
@@ -46,21 +49,74 @@ function applyScenario(array $scenario): array{
                     'id' => (int)$drink['id'],
                 ]);
 
-                $scenario['affected_drink'] = $drink['name'];
+                $affectedDrink = [
+                    'id' => (int)$drink['id'],
+                    'name' => $drink['name'],
+                ];
                 break;
 
             default:
                 throw new InvalidArgumentException('Unbekanntes Scenario.');
         }
 
+        $logStmt = $pdo->prepare(
+            'INSERT INTO scenario_log (scenario_name)
+             VALUES (:scenario_name)'
+        );
+        $logStmt->execute([
+            'scenario_name' => $scenario['name'],
+        ]);
+
+        $scenarioId = (int)$pdo->lastInsertId();
+
         $pdo->commit();
-        return $scenario;
+
+        return [
+            'id' => $scenarioId,
+            'name' => $scenario['name'],
+            'affected_drink' => $affectedDrink,
+        ];
     } catch (Throwable $e) {
         if ($pdo->inTransaction()) {
             $pdo->rollBack();
         }
         throw $e;
     }
+}
+
+function getAllDrinks(): array
+{
+    $pdo = getDb();
+    $stmt = $pdo->query(
+        'SELECT id, name, price, order_count
+         FROM drinks
+         ORDER BY name ASC'
+    );
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+function getCurrentScenario(): ?array
+{
+    $pdo = getDb();
+    $stmt = $pdo->query(
+        'SELECT id, scenario_name, executed_at
+         FROM scenario_log
+         ORDER BY id DESC
+         LIMIT 1'
+    );
+
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$row) {
+        return null;
+    }
+
+    return [
+        'id' => (int)$row['id'],
+        'name' => $row['scenario_name'],
+        'executed_at' => $row['executed_at'],
+    ];
 }
 
 function calculateDrinkUpdate(float $oldPrice, int $oldOrderCount, int $additionalOrders): array{

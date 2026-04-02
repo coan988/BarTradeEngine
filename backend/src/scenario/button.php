@@ -35,7 +35,7 @@ class Button{
     }
 
     public function run(): array{
-        require_once __DIR__ . '/../pricebuilding/pricebuilding.php';
+        require_once __DIR__ . '/../pricebuilding/priceservice.php';
         $selection = $this->chooseScenario();
         $scenario = $selection();
         return applyScenario($scenario);
