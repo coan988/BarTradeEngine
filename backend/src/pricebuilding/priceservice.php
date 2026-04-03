@@ -92,7 +92,6 @@ function getAllDrinks(): array
          FROM drinks
          ORDER BY name ASC'
     );
-
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
@@ -145,20 +144,20 @@ function calculateDrinkUpdate(float $oldPrice, int $oldOrderCount, int $addition
     ];
 }
 
-function findDrinkForUpdate(PDO $pdo, string $name): array{
+function findDrinkForUpdate(PDO $pdo, int $id): array{
     $stmt = $pdo->prepare(
         'SELECT id, name, price, order_count
          FROM drinks
-         WHERE name = :name
+         WHERE id = :id
          LIMIT 1
          FOR UPDATE'
     );
 
-    $stmt->execute(['name' => $name]);
+    $stmt->execute(['id' => $id]);
     $drink = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$drink){
-        throw new InvalidArgumentException("Getränk '{$name}' nicht gefunden.");
+        throw new InvalidArgumentException("Getränk mit ID:'{$id}' nicht gefunden.");
     }
 
     return $drink;
@@ -191,7 +190,7 @@ function insertOrderLog(PDO $pdo, int $drinkId, float $priceAtOrder, int $count)
         ]);
     }
 }
-function drinkorder(string $name, int $orderCount): array{
+function drinkorder(int $id, int $orderCount): array{
     if ($orderCount <= 0) {
         throw new InvalidArgumentException('orderCount muss größer als 0 sein.');
     }
@@ -200,7 +199,7 @@ function drinkorder(string $name, int $orderCount): array{
     $pdo->beginTransaction();
 
     try {
-        $drink = findDrinkForUpdate($pdo, $name);
+        $drink = findDrinkForUpdate($pdo, $id);
 
         $result = calculateDrinkUpdate(
             (float)$drink['price'],

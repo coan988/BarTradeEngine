@@ -8,10 +8,10 @@ echo "\nTest drinkorder():\n";
 
 try {
 
-    $drinkName = "Asbach";
+    $id = 3;
     $orders = 15;
 
-    $result = drinkorder($drinkName, $orders);
+    $result = drinkorder($id, $orders);
 
     echo "Bestellung erfolgreich verarbeitet.\n";
 
