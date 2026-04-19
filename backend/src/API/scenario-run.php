@@ -25,10 +25,11 @@ try {
     $button = new Button();
     $result = $button->run();
 
+    $drinks = new Pricebuilding();
     echo json_encode([
         'success' => true,
         'scenario' => $result,
-        'drinks' => getAllDrinks(),
+        'drinks' => $drinks->drinks,
     ]);
 } catch (Throwable $e) {
     http_response_code(500);

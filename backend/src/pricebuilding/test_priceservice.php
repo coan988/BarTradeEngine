@@ -6,24 +6,24 @@ require_once __DIR__ . '/priceservice.php';
 
 echo "\nTest drinkorder():\n";
 
-try {
+$id = 3;
+$orders = 15;
+$scenario = [
+    'name' => 'stockmarketcrash',
+    'type' => 'all_drinks',
+    'factor' => 0.5
+];
 
-    $id = 3;
-    $orders = 15;
+$order = new Pricebuilding();
+$order->run($id, $orders);
 
-    $result = drinkorder($id, $orders);
+echo "Bestellung verarbeitet.\n";
+echo "Drinks Array:\n";
+var_dump($order->drinks);
 
-    echo "Bestellung erfolgreich verarbeitet.\n";
 
-    echo "ID: " . $result['id'] . "\n";
-    echo "Name: " . $result['name'] . "\n";
-    echo "Alter Preis: " . $result['old_price'] . "\n";
-    echo "Neuer Preis: " . $result['new_price'] . "\n";
-    echo "Orders vorher: " . $result['old_order_count'] . "\n";
-    echo "Orders danach: " . $result['new_order_count'] . "\n";
-
-} catch (Throwable $e) {
-
-    echo "Fehler bei drinkorder():\n";
-    echo $e->getMessage() . "\n";
-}
+$button = new Scenario();
+$button->run($scenario);
+echo "Szenario ausgeführt.\n";
+echo "Aktuelles Szenario:\n";
+var_dump($button->latestScenario);

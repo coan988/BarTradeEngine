@@ -15,9 +15,13 @@ require_once __DIR__ . '/../pricebuilding/priceservice.php';
 header('Content-Type: application/json');
 
 try {
+    $scenario = new Scenario();
+    $drinks = new Pricebuilding();
+    $clock = new Clock();
+
     echo json_encode([
-        'scenario' => getCurrentScenario(),
-        'drinks' => getAllDrinks(),
+        'scenario' => $scenario->latestScenario,
+        'drinks' => $drinks->drinks,
     ]);
 } catch (Throwable $e) {
     http_response_code(500);

@@ -44,12 +44,12 @@ try {
         ]);
         exit;
     }
-
-    drinkorder($drinkId, $quantity);
+    $order = new Pricebuilding();
+    $order->run($drinkId, $quantity);
 
     echo json_encode([
         'success' => true,
-        'drinks' => getAllDrinks(),
+        'drinks' => $order->drinks,
     ]);
 } catch (Throwable $e) {
     http_response_code(500);

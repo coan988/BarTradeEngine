@@ -5,7 +5,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../db.php';
 
 class Scenario{
-    private $latestScenario;
+    public array $latestScenario;
 
     public function __construct(){
         $pdo = getDb();
@@ -172,7 +172,7 @@ class Scenario{
 }
 
 class Pricebuilding{
-    private $drinks;
+    public array $drinks;
 
     public function __construct(){
         $pdo = getDb();
@@ -329,34 +329,36 @@ class Pricebuilding{
 class Clock{
     function run(): void{
         while (true) {
-            sleep(5*60);
-            $pdo = getDb();
-            $pdo->beginTransaction();
+            $timestamp = date('m');
+            if ($timestamp % 10 === 0) {
+                $pdo = getDb();
+                $pdo->beginTransaction();
 
-            $selectStmt = $pdo->prepare(
-                'SELECT id, price
-                FROM drinks
-                FOR UPDATE;'
-            );
-            $selectStmt->execute();
-            $drinks = $selectStmt->fetchAll(PDO::FETCH_ASSOC);
+                $selectStmt = $pdo->prepare(
+                    'SELECT id, price
+                    FROM drinks
+                    FOR UPDATE;'
+                );
+                $selectStmt->execute();
+                $drinks = $selectStmt->fetchAll(PDO::FETCH_ASSOC);
 
-            $updateStmt = $pdo->prepare(
-                'UPDATE drinks
-                set price = :new_price
-                WHERE id = :id'
-            );
+                $updateStmt = $pdo->prepare(
+                    'UPDATE drinks
+                    set price = :new_price
+                    WHERE id = :id'
+                );
 
-            foreach ($drinks as $drink){
-                $oldPrice = (float)$drink['price'];
-                $newPrice = round($oldPrice *0.9, 2);
+                foreach ($drinks as $drink){
+                    $oldPrice = (float)$drink['price'];
+                    $newPrice = round($oldPrice *0.9, 2);
 
-                $updateStmt->execute([
-                    'new_price' => $newPrice,
-                    'id' => (int)$drink['id'],
-                ]);
-                $pricebuilding = new Pricebuilding();
-                $pricebuilding->insertPriceChange($pdo, $newPrice, $oldPrice, (int)$drink['id'], null, null);
+                    $updateStmt->execute([
+                        'new_price' => $newPrice,
+                        'id' => (int)$drink['id'],
+                    ]);
+                    $pricebuilding = new Pricebuilding();
+                    $pricebuilding->insertPriceChange($pdo, $newPrice, $oldPrice, (int)$drink['id'], null, null);
+                }
             }
             $pdo->commit();
         }
