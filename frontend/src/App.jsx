@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
+import "./App.css";
+import Pricelist from "./pricelist";
 
 function App() {
   const [drinks, setDrinks] = useState([]);
   const [scenario, setScenario] = useState(null);
   const [quantities, setQuantities] = useState({});
   const [message, setMessage] = useState("");
+  const [currentPage, setCurrentPage] = useState("home");
 
   async function fetchState() {
     try {
@@ -103,44 +106,48 @@ function App() {
     fetchState();
   }, []);
 
+  if (currentPage === "pricelist") {
+    return <Pricelist onBack={() => setCurrentPage("home")} />;
+  }
+
   return (
-    <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
+    <div className="app-container">
       <h1>Getränke</h1>
 
-      <div style={{ marginBottom: "16px" }}>
-        <button onClick={fetchState} style={{ marginRight: "8px" }}>
+      <div className="button-row">
+        <button onClick={fetchState} className="button with-margin">
           Preise aktualisieren
+        </button>
+        <button
+          onClick={() => setCurrentPage("pricelist")}
+          className="button"
+        >
+          Preisliste öffnen
         </button>
       </div>
 
-      <table
-        style={{
-          borderCollapse: "collapse",
-          width: "100%",
-          marginBottom: "16px",
-        }}
-      >
+      <table className="drinks-table">
         <thead>
           <tr>
-            <th style={thStyle}>ID</th>
-            <th style={thStyle}>Name</th>
-            <th style={thStyle}>Preis</th>
-            <th style={thStyle}>Quantity</th>
+            <th className="table-head-cell">ID</th>
+            <th className="table-head-cell">Name</th>
+            <th className="table-head-cell">Preis</th>
+            <th className="table-head-cell">Quantity</th>
           </tr>
         </thead>
         <tbody>
           {drinks.map((drink) => (
             <tr key={drink.id}>
-              <td style={tdStyle}>{drink.id}</td>
-              <td style={tdStyle}>{drink.name}</td>
-              <td style={tdStyle}>{drink.price} €</td>
-              <td style={tdStyle}>
+              <td className="table-cell">{drink.id}</td>
+              <td className="table-cell">{drink.name}</td>
+              <td className="table-cell">{drink.price} €</td>
+              <td className="table-cell">
                 <input
                   type="text"
                   value={quantities[drink.id] ?? ""}
                   onChange={(e) => handleQuantityChange(drink.id, e.target.value)}
                   placeholder="Int eingeben"
-                  style={{ width: "100px" }}
+                  className="quantity-input"
                 />
               </td>
             </tr>
@@ -148,45 +155,23 @@ function App() {
         </tbody>
       </table>
 
-      <div style={{ marginBottom: "16px" }}>
-        <button onClick={runOrder} style={{ marginRight: "8px" }}>
+      <div className="button-row">
+        <button onClick={runOrder} className="button with-margin">
           Order starten
         </button>
-        <button onClick={runScenario}>Scenario starten</button>
+        <button onClick={runScenario} className="button">
+          Scenario starten
+        </button>
       </div>
 
       <h2>Letztes Scenario</h2>
-      <div
-        style={{
-          border: "1px solid #ccc",
-          padding: "12px",
-          minHeight: "80px",
-          backgroundColor: "#f9f9f9",
-          whiteSpace: "pre-wrap",
-        }}
-      >
+      <div className="scenario-box">
         {scenario ? JSON.stringify(scenario, null, 2) : "Kein Scenario vorhanden."}
       </div>
 
-      {message && (
-        <div style={{ marginTop: "16px", color: "darkred" }}>
-          {message}
-        </div>
-      )}
+      {message && <div className="message-box">{message}</div>}
     </div>
   );
 }
-
-const thStyle = {
-  border: "1px solid #ccc",
-  padding: "8px",
-  textAlign: "left",
-  backgroundColor: "#eee",
-};
-
-const tdStyle = {
-  border: "1px solid #ccc",
-  padding: "8px",
-};
 
 export default App;

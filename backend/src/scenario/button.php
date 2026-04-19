@@ -1,8 +1,8 @@
 <?php
 class Button{
     private array $scenarios = [];
-    private array $cachscenario  =[];
-    private ?string $currentScenario = null;
+    private array $cachedScenario = [];
+    private array $currentScenario = [];
 
     function __construct(){
         $buttonfunc = get_defined_functions()['user'];
@@ -22,22 +22,31 @@ class Button{
     }
 
     function chooseScenario(){
-        if ($this->currentScenario === null){
-            $index = array_rand($this->scenarios);
-            $this->currentScenario = $this->scenarios[$index];
+        $index = array_rand($this->scenarios);
+        $scenarioName = $this->scenarios[$index];
+        $scenarioData = $scenarioName();
+
+        if (in_array($scenarioName, $this->cachedScenario)){
+            return $this->chooseScenario();
         }
-        return $this->currentScenario;
+        $this->currentScenario = $scenarioData;
+        $this->cache($scenarioName);
+        
+        return $scenarioData;
     }
 
-    function cache(string $selection){
-    # Cache von z.B. 3 Einführen, damit eine Funktion nicht direckt nochmal gezogen werden kann.
-    # dafür erstmal Funktionen schreiben
+    function cache(string $scenarioName): void{
+        $this->cachedScenario[] = $scenarioName;
+        if (count($this->cachedScenario) > 3){
+            array_shift($this->cachedScenario);
+        }
     }
 
     public function run(): array{
         require_once __DIR__ . '/../pricebuilding/priceservice.php';
-        $selection = $this->chooseScenario();
-        $scenario = $selection();
-        return applyScenario($scenario);
+        $scenario = $this->chooseScenario();
+        $applyScenario = new Scenario();
+        $applyScenario->run($scenario);
+        return $scenario;
     }
 }
